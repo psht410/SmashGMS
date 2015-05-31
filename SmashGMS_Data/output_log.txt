@@ -1,0 +1,42 @@
+Initialize engine version: 5.0.1f1 (5a2e8fe35a68)
+GfxDevice: creating device client; threaded=1
+Direct3D:
+    Version:  Direct3D 11.0 [level 11.0]
+    Renderer: AMD Radeon R9 200 Series (ID=0x67b1)
+    Vendor:   ATI
+    VRAM:     3072 MB
+Begin MonoManager ReloadAssembly
+Platform assembly: D:\[Portfolio]\Unity\SmashGMS_1st PROTOTYPE\SmashGMS_Data\Managed\UnityEngine.dll (this message is harmless)
+Loading D:\[Portfolio]\Unity\SmashGMS_1st PROTOTYPE\SmashGMS_Data\Managed\UnityEngine.dll into Unity Child Domain
+Platform assembly: D:\[Portfolio]\Unity\SmashGMS_1st PROTOTYPE\SmashGMS_Data\Managed\Assembly-CSharp-firstpass.dll (this message is harmless)
+Loading D:\[Portfolio]\Unity\SmashGMS_1st PROTOTYPE\SmashGMS_Data\Managed\Assembly-CSharp-firstpass.dll into Unity Child Domain
+Platform assembly: D:\[Portfolio]\Unity\SmashGMS_1st PROTOTYPE\SmashGMS_Data\Managed\Assembly-CSharp.dll (this message is harmless)
+Loading D:\[Portfolio]\Unity\SmashGMS_1st PROTOTYPE\SmashGMS_Data\Managed\Assembly-CSharp.dll into Unity Child Domain
+Platform assembly: D:\[Portfolio]\Unity\SmashGMS_1st PROTOTYPE\SmashGMS_Data\Managed\UnityEngine.UI.dll (this message is harmless)
+Loading D:\[Portfolio]\Unity\SmashGMS_1st PROTOTYPE\SmashGMS_Data\Managed\UnityEngine.UI.dll into Unity Child Domain
+Platform assembly: D:\[Portfolio]\Unity\SmashGMS_1st PROTOTYPE\SmashGMS_Data\Managed\UnityEngine.Cloud.Analytics.dll (this message is harmless)
+Loading D:\[Portfolio]\Unity\SmashGMS_1st PROTOTYPE\SmashGMS_Data\Managed\UnityEngine.Cloud.Analytics.dll into Unity Child Domain
+Platform assembly: D:\[Portfolio]\Unity\SmashGMS_1st PROTOTYPE\SmashGMS_Data\Managed\UnityEngine.Cloud.Analytics.Util.dll (this message is harmless)
+Loading D:\[Portfolio]\Unity\SmashGMS_1st PROTOTYPE\SmashGMS_Data\Managed\UnityEngine.Cloud.Analytics.Util.dll into Unity Child Domain
+- Completed reload, in  0.030 seconds
+desktop: 1920x1080 60Hz; virtual: 1920x1080 at 0,0
+<RI> Initializing input.
+<RI> Input initialized.
+<RI> Initialized touch support.
+Platform assembly: D:\[Portfolio]\Unity\SmashGMS_1st PROTOTYPE\SmashGMS_Data\Managed\System.Core.dll (this message is harmless)
+Platform assembly: D:\[Portfolio]\Unity\SmashGMS_1st PROTOTYPE\SmashGMS_Data\Managed\System.dll (this message is harmless)
+Setting up 2 worker threads for Enlighten.
+  Thread -> id: 4a0 -> priority: 1 
+  Thread -> id: 1f68 -> priority: 1 
+Unloading 3 Unused Serialized files (Serialized files now loaded: 0)
+UnloadTime: 2.436610 ms
+
+Unloading 18 unused Assets to reduce memory usage. Loaded Objects now: 709.
+Total: 0.314112 ms (FindLiveObjects: 0.035328 ms CreateObjectMapping: 0.018176 ms MarkObjects: 0.217088 ms  DeleteObjects: 0.042496 ms)
+
+Unloading 2 Unused Serialized files (Serialized files now loaded: 0)
+UnloadTime: 1.154305 ms
+
+Unloading 31 unused Assets to reduce memory usage. Loaded Objects now: 602.
+Total: 0.241920 ms (FindLiveObjects: 0.013056 ms CreateObjectMapping: 0.016896 ms MarkObjects: 0.128000 ms  DeleteObjects: 0.083712 ms)
+
