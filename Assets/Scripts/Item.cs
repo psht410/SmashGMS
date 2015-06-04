@@ -14,11 +14,12 @@ public class Item : MonoBehaviour {
 	Player player;
 
 	void Awake(){
-		player = GameObject.Find("Player").GetComponent<Player> ();
+
 	}
 
 	void OnCollisionEnter(Collision info){
 		if (info.transform.CompareTag ("Player")) {
+			player = info.gameObject.GetComponent<Player> ();
 			switch(What){
 				case ITEM.CPH:
 					player.itemCPH();

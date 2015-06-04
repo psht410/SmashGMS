@@ -20,15 +20,15 @@ public class DetonatorForce : DetonatorComponent
 	private Collider[] _colliders;
 	private GameObject _tempFireObject;
 
-	private int myDamage;
+	private int myDamage = 30;
 
 	override public void Init()
 	{
 		//unused
 	}
 
-	void Awake(){
-		myDamage = GetComponent<Attack>().ATKDMG;
+	void Start(){
+//		myDamage = GetComponent<Attack>().ATKDMG;
 	}
 
 	void Update()
@@ -70,7 +70,6 @@ public class DetonatorForce : DetonatorComponent
 				if (hit.GetComponent<Obstacle>())
 				{
 					hit.GetComponent<Obstacle>().isDamaged(myDamage);
-					Debug.Log("안녕?");
 					//align the force along the object's rotation
 					//this is wrong - need to attenuate the velocity according to distance from the explosion center			
 					//offsetting the explosion force position by the negative of the explosion's direction may help

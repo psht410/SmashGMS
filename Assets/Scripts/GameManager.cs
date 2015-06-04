@@ -31,19 +31,15 @@ public class GameManager : MonoBehaviour {
 	private	int maxcurrentCombo = 0;
 	
 	private int[] spawnTimes = {3, 3, 2, 1, 3, 4, 3, 1,	//Wave 1
-					3, 4, 2, 3, 4, 1,		//Wave 2
-					4, 3, 4, 4, 2, 3, 1,	//Wave 3
-					1,						//Wave 4 ( BOSS_GMSGATE )
-					1						//Wave 5 ( FINAL_BOSS )
+								3, 4, 2, 3, 4, 1,		//Wave 2
+								4, 3, 4, 4, 2, 3, 1,	//Wave 3
+								1,						//Wave 4 ( BOSS_GMSGATE )
+								1						//Wave 5 ( FINAL_BOSS )
 	};
 	private int[] spawnPosition = {-10, 0, 10};
 	
 	// Use this for initialization
 	void Awake () {
-<<<<<<< HEAD
-=======
-		/*
->>>>>>> origin/master
 		if (instance == null) {
 			instance = this;
 		} else if (instance != this) {
@@ -63,6 +59,7 @@ public class GameManager : MonoBehaviour {
 			//Debug.Log ("현재 인덱스 : " + currentIndex);
 			
 			if(currentIndex == 0 || currentIndex == 8 || currentIndex == 14 || currentIndex == 21){
+				yield return new WaitForSeconds(1);
 				waveAlertText.SetActive(true);
 				GameObject.Find("WaveAlert").GetComponent<Text>().text = "Wave " + ++currentWave;
 				yield return new WaitForSeconds(1);
@@ -70,29 +67,22 @@ public class GameManager : MonoBehaviour {
 			}
 			
 			GameObject wave = null;
-			for(int times = 0; times<spawnTimes[currentIndex]; times++){
+			for(int times = 0; times<spawnTimes[currentIndex]; times++){	//Spawn Obstacles
+
+
+				int prevRndPos = 0;
+				int tempRndPos = (int)Random.Range(0, spawnPosition.Length);
+				GameObject[] wave3grid = new GameObject[3];
+
 				if(currentIndex == 5 || currentIndex == 6 || currentIndex == 8 || currentIndex == 14 || currentIndex == 15 || currentIndex == 16 || currentIndex == 17 || currentIndex == 18 || currentIndex == 19){
-					int prevRnd = 0;
-					int tempRnd = (int)Random.Range(0, spawnPosition.Length);
-<<<<<<< HEAD
-=======
-
->>>>>>> origin/master
-					GameObject wave1 = (GameObject)Instantiate(obstacle[currentIndex], transform.position + new Vector3(spawnPosition[tempRnd], 0), transform.rotation);
-					wave1.transform.parent = transform;
-
-					prevRnd = tempRnd;
-					tempRnd = (int)Random.Range(0, spawnPosition.Length);
-					if(tempRnd != prevRnd){
-						GameObject wave2 = (GameObject)Instantiate(obstacle[currentIndex], transform.position + new Vector3(spawnPosition[tempRnd], 0), transform.rotation);
-						wave2.transform.parent = transform;
-					}
-
-					prevRnd = tempRnd;
-					tempRnd = (int)Random.Range(0, spawnPosition.Length);
-					if(tempRnd != prevRnd){
-						GameObject wave3 = (GameObject)Instantiate(obstacle[currentIndex], transform.position + new Vector3(spawnPosition[(int)Random.Range(0, spawnPosition.Length)], 0), transform.rotation);
-						wave3.transform.parent = transform;
+					for(int j=0; j<3; j++){
+						tempRndPos = (int)Random.Range(0, spawnPosition.Length);
+						if(prevRndPos != tempRndPos){
+							wave3grid[j] = Instantiate(obstacle[currentIndex], transform.position + new Vector3(spawnPosition[tempRndPos], 0), transform.rotation) as GameObject;
+							wave3grid[j].transform.parent = transform;
+						}
+						prevRndPos = tempRndPos;
+						Debug.Log("3칸짜리 생성" + j);
 					}
 				}else{
 					wave = Instantiate(obstacle[currentIndex], transform.position, transform.rotation) as GameObject;
@@ -100,35 +90,22 @@ public class GameManager : MonoBehaviour {
 				}
 				yield return new WaitForSeconds(Random.Range(.8f, 2));
 			}
+
 			while(transform.childCount != 0){
-				yield return new WaitForEndOfFrame();
+				yield return new WaitForEndOfFrame();	// 자식 오브젝트가 전부 없어지기 전까지 대기.
 			}
 			
-			if (obstacle.Length <= ++currentIndex) { // 게임오버 처리 구간 //
-//				currentIndex = 0;
+			if (obstacle.Length <= ++currentIndex) { // 클리어.
 				GameOver(true, true);
 			}
 			
 			if(gameState == GAME_STATE.GAME_OVER)
 				yield break;
-<<<<<<< HEAD
 
-=======
-			
->>>>>>> origin/master
-			yield return new WaitForSeconds(2);
+			yield return new WaitForSeconds(1);
 		}
 		
 		//Debug.Log ("코루틴 끝");
-	}
-	
-	public int Combo{
-		get{
-			return currentCombo;
-		}
-		set{
-			currentCombo = value;
-		}
 	}
 	
 	public void UpdateScore(int score){
@@ -150,15 +127,9 @@ public class GameManager : MonoBehaviour {
 			
 			GameObject.Find("Result").GetComponent<Text> ().text =
 				"CLEAR    : " + isClear + "\n" +
-<<<<<<< HEAD
 				"MODE     : " + "응~" + "\n" +
 				"MAXCombo : " + maxcurrentCombo + "\n" +
 				"SCORE    : " + currentScore;
-=======
-					"MODE     : " + "NaN" + "\n" +
-					"MAXCombo : " + maxcurrentCombo + "\n" +
-					"SCORE    : " + currentScore;
->>>>>>> origin/master
 		} else {
 			if(selectedPanel != null)
 				selectedPanel.SetActive(false);

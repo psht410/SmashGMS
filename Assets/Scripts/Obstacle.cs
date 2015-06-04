@@ -26,7 +26,7 @@ public class Obstacle : MonoBehaviour {
 	void FixedUpdate () {
 		transform.Translate (Vector3.down * Time.deltaTime * fallSpeed);
 		if (defaultFallSpeed * 1.3f > fallSpeed) {
-			fallSpeed += 0.008f;
+			fallSpeed += 0.005f;
 		}
 	}
 

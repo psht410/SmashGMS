@@ -26,9 +26,11 @@ public class Player : MonoBehaviour {
 	Rigidbody rigid;
 	Animator anim;
 	bool isGrounded;
+	bool itemEffect;
 	float time = 0;
 	float delay = 1f;
 	float colDelay = 1f;
+	float itemDelay = 10f;
 
 	void Awake () {
 		rigid = GetComponent<Rigidbody> ();
@@ -59,7 +61,7 @@ public class Player : MonoBehaviour {
 			if (Input.GetKeyDown (KeyCode.DownArrow) && delay < 0) {	//Shield Pressed
 				sld.gameObject.SetActive(true);
 				time = 10f;		//지속프레임.
-				delay = 1f;
+				delay = .7f;
 			}
 			if (Input.GetButtonDown ("Fire1")) {	//'Z' Pressed ( Atk )
 				rigid.velocity = new Vector3(0, rigid.velocity.y);
@@ -72,12 +74,6 @@ public class Player : MonoBehaviour {
 			}
 
 			if (time < 0) {
-				/*
-				sldCollider.isTrigger = false;
-				sldCollider.radius = 0;
-				atkCollider.isTrigger = false;
-				atkCollider.radius = 0;
-				*/
 				sld.SetActive(false);
 				atk.SetActive(false);
 			}
@@ -105,7 +101,8 @@ public class Player : MonoBehaviour {
 			delay -= Time.deltaTime;
 		if(colDelay > 0)
 			colDelay -= Time.deltaTime;
-
+		if (itemDelay > 0)
+			itemDelay -= Time.deltaTime;
 //		Debug.Log("colDelay : " + colDelay);
 	}
 
@@ -118,6 +115,10 @@ public class Player : MonoBehaviour {
 	}
 
 	void damaged(){
+		if (itemEffect && itemDelay > 0) {
+			itemEffect = false;
+			return;
+		}
 		if (hPoint >= 0) {
 			hpImg [hPoint].SetActive (false);
 			GameManager.instance.UpdateScore(0);
@@ -138,7 +139,8 @@ public class Player : MonoBehaviour {
 	}
 
 	public void itemMojito(){	//모히또.
-
+		itemEffect = true;
+		itemDelay = 10f;
 	}
 
 	public void itemYomamtte(){	//요맘때.

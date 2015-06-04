@@ -7,7 +7,7 @@ public class Attack : MonoBehaviour {
 
 	public bool isUlt = false;
 
-	void Awake(){
+	void Start(){
 		if(isUlt)
 			myDamage = 30;
 	}
@@ -20,12 +20,6 @@ public class Attack : MonoBehaviour {
 		if (other.CompareTag ("Obstacle")) {
 			other.GetComponent<Obstacle>().isDamaged(myDamage);
 			//Debug.Log ("공격이 닿았다!");
-		}
-	}
-	
-	void OnTriggerExit(Collider other){
-		if (other.CompareTag ("Obstacle")) {
-			//Debug.Log ("공격이 떼졌다!");
 		}
 	}
 
