@@ -40,15 +40,11 @@ public class GameManager : MonoBehaviour {
 
 	// Use this for initialization
 	void Awake () {
-/*
 		if (instance == null) {
 			instance = this;
 		} else if (instance != this) {
 			Destroy(gameObject);
 		}
-*/
-		instance = this;
-		
 		StartCoroutine ("GenerateWave");
 		scoreText = GameObject.Find ("ComboScore").GetComponent<Text> ();
 		waveText = waveAlertText.GetComponent<Text> ();
@@ -72,17 +68,29 @@ public class GameManager : MonoBehaviour {
 			GameObject wave = null;
 			for(int times = 0; times<spawnTimes[currentIndex]; times++){
 				if(currentIndex == 5 || currentIndex == 6 || currentIndex == 8 || currentIndex == 14 || currentIndex == 15 || currentIndex == 16 || currentIndex == 17 || currentIndex == 18 || currentIndex == 19){
-					GameObject wave1 = (GameObject)Instantiate(obstacle[currentIndex], transform.position + new Vector3(spawnPosition[(int)Random.Range(0, spawnPosition.Length)], 0), transform.rotation);
-					GameObject wave2 = (GameObject)Instantiate(obstacle[currentIndex], transform.position + new Vector3(spawnPosition[(int)Random.Range(0, spawnPosition.Length)], 0), transform.rotation);
-					GameObject wave3 = (GameObject)Instantiate(obstacle[currentIndex], transform.position + new Vector3(spawnPosition[(int)Random.Range(0, spawnPosition.Length)], 0), transform.rotation);
+					int prevRnd = 0;
+					int tempRnd = (int)Random.Range(0, spawnPosition.Length);
+					GameObject wave1 = (GameObject)Instantiate(obstacle[currentIndex], transform.position + new Vector3(spawnPosition[tempRnd], 0), transform.rotation);
 					wave1.transform.parent = transform;
-					wave2.transform.parent = transform;
-					wave3.transform.parent = transform;
+
+					prevRnd = tempRnd;
+					tempRnd = (int)Random.Range(0, spawnPosition.Length);
+					if(tempRnd != prevRnd){
+						GameObject wave2 = (GameObject)Instantiate(obstacle[currentIndex], transform.position + new Vector3(spawnPosition[tempRnd], 0), transform.rotation);
+						wave2.transform.parent = transform;
+					}
+
+					prevRnd = tempRnd;
+					tempRnd = (int)Random.Range(0, spawnPosition.Length);
+					if(tempRnd != prevRnd){
+						GameObject wave3 = (GameObject)Instantiate(obstacle[currentIndex], transform.position + new Vector3(spawnPosition[(int)Random.Range(0, spawnPosition.Length)], 0), transform.rotation);
+						wave3.transform.parent = transform;
+					}
 				}else{
-					wave = (GameObject) Instantiate(obstacle[currentIndex], transform.position, transform.rotation);
+					wave = Instantiate(obstacle[currentIndex], transform.position, transform.rotation) as GameObject;
 					wave.transform.parent = transform;
 				}
-				yield return new WaitForSeconds(Random.Range(1, 3));
+				yield return new WaitForSeconds(Random.Range(.8f, 2));
 			}
 			while(transform.childCount != 0){
 				yield return new WaitForEndOfFrame();
@@ -94,7 +102,7 @@ public class GameManager : MonoBehaviour {
 			}
 
 			if(gameState == GAME_STATE.GAME_OVER)
-				break;
+				yield break;
 
 			yield return new WaitForSeconds(2);
 		}
@@ -130,7 +138,7 @@ public class GameManager : MonoBehaviour {
 			
 			GameObject.Find("Result").GetComponent<Text> ().text =
 				"CLEAR    : " + isClear + "\n" +
-				"MODE     : " + "NaN" + "\n" +
+				"MODE     : " + "응~" + "\n" +
 				"MAXCombo : " + maxcurrentCombo + "\n" +
 				"SCORE    : " + currentScore;
 		} else {

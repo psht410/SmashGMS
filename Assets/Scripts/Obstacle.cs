@@ -25,8 +25,8 @@ public class Obstacle : MonoBehaviour {
 
 	void FixedUpdate () {
 		transform.Translate (Vector3.down * Time.deltaTime * fallSpeed);
-		if (defaultFallSpeed * 1.5f > fallSpeed) {
-			fallSpeed += Time.deltaTime;
+		if (defaultFallSpeed * 1.3f > fallSpeed) {
+			fallSpeed += 0.008f;
 		}
 	}
 
@@ -40,7 +40,7 @@ public class Obstacle : MonoBehaviour {
 			if(isDispenser){
 				Instantiate(items[Random.Range(0,3)], transform.position, transform.rotation);
 			}else if(Random.Range(0, 100) < 3){
-				Instantiate(dispenser, transform.position + new Vector3(0, 30f), transform.rotation);
+				Instantiate(dispenser, transform.position + new Vector3(0, 50f), transform.rotation);
 			}
 			Destroy(gameObject);
 		}

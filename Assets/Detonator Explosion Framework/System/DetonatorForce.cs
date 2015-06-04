@@ -19,10 +19,16 @@ public class DetonatorForce : DetonatorComponent
 	
 	private Collider[] _colliders;
 	private GameObject _tempFireObject;
-	
+
+	private int myDamage;
+
 	override public void Init()
 	{
 		//unused
+	}
+
+	void Awake(){
+		myDamage = GetComponent<Attack>().ATKDMG;
 	}
 
 	void Update()
@@ -61,17 +67,20 @@ public class DetonatorForce : DetonatorComponent
 					continue;
 				}
 				
-				if (hit.GetComponent<Rigidbody>())
+				if (hit.GetComponent<Obstacle>())
 				{
+					hit.GetComponent<Obstacle>().isDamaged(myDamage);
+					Debug.Log("안녕?");
 					//align the force along the object's rotation
 					//this is wrong - need to attenuate the velocity according to distance from the explosion center			
 					//offsetting the explosion force position by the negative of the explosion's direction may help
-					hit.GetComponent<Rigidbody>().AddExplosionForce((power * size), _explosionPosition, (radius * size), (4f * MyDetonator().upwardsBias * size));
-					
+//					hit.GetComponent<Rigidbody>().AddExplosionForce((power * size), _explosionPosition, (radius * size), (4f * MyDetonator().upwardsBias * size));
+
 					//fixed 6/15/2013 - didn't work before, was sending message to this script instead :)
-					hit.gameObject.SendMessage("OnDetonatorForceHit", null, SendMessageOptions.DontRequireReceiver);
+//					hit.gameObject.SendMessage("OnDetonatorForceHit", null, SendMessageOptions.DontRequireReceiver);
 					
 					//and light them on fire for Rune
+/*
 					if (fireObject)
 					{
 						//check to see if the object already is on fire. being on fire twice is silly
@@ -89,6 +98,7 @@ public class DetonatorForce : DetonatorComponent
 							Destroy(_tempFireObject,fireObjectLife);
 						}
 					}
+*/
 				}
 			}
 			_delayedExplosionStarted = false;
