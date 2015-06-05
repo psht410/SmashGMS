@@ -25,7 +25,7 @@ public class GameManager : MonoBehaviour {
 	private Text waveText;
 	
 	private int currentScore = 0;
-	private int currentIndex = 0;
+	private int currentSpawnIndex = 0;
 	private int currentCombo = 0;
 	private int currentWave = 0;
 	private	int maxcurrentCombo = 0;
@@ -56,9 +56,9 @@ public class GameManager : MonoBehaviour {
 		}
 		
 		while (true) {
-			//Debug.Log ("현재 인덱스 : " + currentIndex);
+			//Debug.Log ("현재 인덱스 : " + currentSpawnIndex);
 			
-			if(currentIndex == 0 || currentIndex == 8 || currentIndex == 14 || currentIndex == 21){
+			if(currentSpawnIndex == 0 || currentSpawnIndex == 8 || currentSpawnIndex == 14 || currentSpawnIndex == 21){
 				yield return new WaitForSeconds(1);
 				waveAlertText.SetActive(true);
 				GameObject.Find("WaveAlert").GetComponent<Text>().text = "Wave " + ++currentWave;
@@ -67,35 +67,33 @@ public class GameManager : MonoBehaviour {
 			}
 			
 			GameObject wave = null;
-			for(int times = 0; times<spawnTimes[currentIndex]; times++){	//Spawn Obstacles
-
-
+//			for(int times = 0; times<spawnTimes[currentSpawnIndex]; times++){	//Spawn Obstacles
 				int prevRndPos = 0;
 				int tempRndPos = (int)Random.Range(0, spawnPosition.Length);
 				GameObject[] wave3grid = new GameObject[3];
 
-				if(currentIndex == 5 || currentIndex == 6 || currentIndex == 8 || currentIndex == 14 || currentIndex == 15 || currentIndex == 16 || currentIndex == 17 || currentIndex == 18 || currentIndex == 19){
+				if(currentSpawnIndex == 5 || currentSpawnIndex == 6 || currentSpawnIndex == 8 || currentSpawnIndex == 14 || currentSpawnIndex == 15 || currentSpawnIndex == 16 || currentSpawnIndex == 17 || currentSpawnIndex == 18 || currentSpawnIndex == 19){
 					for(int j=0; j<3; j++){
 						tempRndPos = (int)Random.Range(0, spawnPosition.Length);
 						if(prevRndPos != tempRndPos){
-							wave3grid[j] = Instantiate(obstacle[currentIndex], transform.position + new Vector3(spawnPosition[tempRndPos], 0), transform.rotation) as GameObject;
+							wave3grid[j] = Instantiate(obstacle[currentSpawnIndex], transform.position + new Vector3(spawnPosition[tempRndPos], 0), transform.rotation) as GameObject;
 							wave3grid[j].transform.parent = transform;
 						}
 						prevRndPos = tempRndPos;
 						Debug.Log("3칸짜리 생성" + j);
 					}
 				}else{
-					wave = Instantiate(obstacle[currentIndex], transform.position, transform.rotation) as GameObject;
+					wave = Instantiate(obstacle[currentSpawnIndex], transform.position, transform.rotation) as GameObject;
 					wave.transform.parent = transform;
 				}
 				yield return new WaitForSeconds(Random.Range(.8f, 2));
-			}
+//			}
 
 			while(transform.childCount != 0){
 				yield return new WaitForEndOfFrame();	// 자식 오브젝트가 전부 없어지기 전까지 대기.
 			}
 			
-			if (obstacle.Length <= ++currentIndex) { // 클리어.
+			if (obstacle.Length <= ++currentSpawnIndex) { // 클리어.
 				GameOver(true, true);
 			}
 			
