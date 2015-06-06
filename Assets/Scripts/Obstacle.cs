@@ -36,7 +36,8 @@ public class Obstacle : MonoBehaviour {
 //		Instantiate (damaged, transform.position, Quaternion.identity);
 		if (hp < 1) {
 			//Debug.Log("깽창");
-			Instantiate (destroyed, transform.position, Quaternion.identity);
+			GameObject destroyedEffect = Instantiate (destroyed, transform.position, Quaternion.identity) as GameObject;
+            Destroy(destroyedEffect, 3);
 			if(isDispenser){
 				Instantiate(items[Random.Range(0,3)], transform.position, transform.rotation);
 			}else if(Random.Range(0, 100) < 3){

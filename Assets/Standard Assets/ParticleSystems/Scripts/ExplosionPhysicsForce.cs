@@ -9,6 +9,9 @@ namespace UnityStandardAssets.Effects
     {
         public float explosionForce = 4;
 
+		void Awake(){
+			Destroy (gameObject, 3);
+		}
 
         private IEnumerator Start()
         {

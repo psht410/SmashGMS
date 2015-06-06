@@ -139,6 +139,8 @@ public class Player : MonoBehaviour {
 			GameManager.instance.UpdateScore(0);
 		}
 		if (--hPoint < 0 && GameManager.instance.gameState == GAME_STATE.IN_GAME) {
+            GameManager.instance.musicSource.Stop();
+            GameManager.instance.PlaySingle(GameManager.instance.gameover);
 			GameManager.instance.GameOver(false, false);
 		}
 		anim.SetTrigger("DMG");

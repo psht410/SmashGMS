@@ -18,7 +18,11 @@ public class GameManager : MonoBehaviour {
 	public GameObject gameOverPanel;
 	public GameObject gameClearPanel;
 	public GameObject waveAlertText;
-	
+
+    public AudioClip ring, gameover, gameclear, boss, bossBGM;
+    public AudioSource efxSource;
+    public AudioSource musicSource;
+
 	public Sprite gameClear, gameOver;
     public Button btn;
 
@@ -31,6 +35,7 @@ public class GameManager : MonoBehaviour {
 	private Text waveText;
 	
 	private long currentScore = 0;
+
 	private int currentSpawnIndex = 0;
 	private int currentCombo = 0;
 	private int currentWave = 0;
@@ -74,11 +79,19 @@ public class GameManager : MonoBehaviour {
             int tempRndPos = (int)Random.Range(0, spawnPosition.Length);
             GameObject[] wave3grid = new GameObject[3];
 
-			if(currentSpawnIndex == 0 || currentSpawnIndex == 8 || currentSpawnIndex == 14 || currentSpawnIndex == 21){ //웨이브 넘어갈때.
-				yield return new WaitForSeconds(1);
+			if(currentSpawnIndex == 0 || currentSpawnIndex == 8 || currentSpawnIndex == 14 || currentSpawnIndex == 21 || currentSpawnIndex == 22){ //웨이브 넘어갈때.
+                if (currentSpawnIndex == 22)
+                    PlaySingle(boss);
+                else
+                    PlaySingle(ring);
+                yield return new WaitForSeconds(2);
 				waveAlertText.SetActive(true);
-				waveAlertText.GetComponent<Text>().text = "Wave " + ++currentWave;
-				yield return new WaitForSeconds(1);
+                if (currentSpawnIndex == 22)
+                    waveAlertText.GetComponent<Text>().text = "Boss Awaken!";
+                else
+                    waveAlertText.GetComponent<Text>().text = "Wave " + ++currentWave;
+                
+				yield return new WaitForSeconds(5);
 				waveAlertText.SetActive(false);
 			}
 
@@ -87,7 +100,12 @@ public class GameManager : MonoBehaviour {
 //          for(int times = 0; times<spawnTimes[currentSpawnIndex]; times++){	//Spawn Obstacles
             while  (spawnTimes[currentSpawnIndex] != 0)
                 {
-
+                    if (currentSpawnIndex == 22)
+                    {
+                        musicSource.Stop();
+                        musicSource.clip = bossBGM;
+                        musicSource.Play();
+                    }
                     if (currentSpawnIndex == 5 || currentSpawnIndex == 6 || currentSpawnIndex == 8 || currentSpawnIndex == 14 || currentSpawnIndex == 15 || currentSpawnIndex == 16 || currentSpawnIndex == 17 || currentSpawnIndex == 18 || currentSpawnIndex == 19)
                     {
                         for (int j = 0; j < 3; j++)
@@ -121,6 +139,7 @@ public class GameManager : MonoBehaviour {
                     {
                         wave = Instantiate(obstacle[bossIndex[currentWave]], transform.position, transform.rotation) as GameObject;
                         wave.transform.parent = transform;
+
                     }
                 }
 //			}
@@ -131,6 +150,8 @@ public class GameManager : MonoBehaviour {
 			
 			if (obstacle.Length <= ++currentSpawnIndex) {
                 yield return new WaitForSeconds(3f);
+                musicSource.clip = gameclear;
+                musicSource.Play();
 				GameOver(false, true);
 			}
 			
@@ -206,7 +227,7 @@ public class GameManager : MonoBehaviour {
 			if(isClear){
 				GameObject.Find("Game").GetComponent<Image>().sprite = gameClear;
                 btn.onClick.RemoveAllListeners();
-                btn.onClick.AddListener(() => GameOver(true, true));
+                btn.onClick.AddListener(() => GameOverClear(true));
             }
 		}
 	}
@@ -243,12 +264,15 @@ public class GameManager : MonoBehaviour {
         }
     }
 
-	public void GameOverNotClear(){
-		GameOver (true, false);
-	}
+    public void PlaySingle(AudioClip clip)
+    {
+//        musicSource.Stop();
+        efxSource.clip = clip;
+        efxSource.Play();
+    }
 
-	public void GameOverClear(){
-		GameOver (true, true);
+	public void GameOverClear(bool isClear){
+		GameOver (true, isClear);
 	}
 	
 	public void InitGame(){
