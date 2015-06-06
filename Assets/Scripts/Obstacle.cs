@@ -31,16 +31,16 @@ public class Obstacle : MonoBehaviour {
 	}
 
 	public void isDamaged(int damage){
-		hp -= damage;
+        hp -= damage;
+        GameManager.instance.UpdateScore(score);
 //		Instantiate (damaged, transform.position, Quaternion.identity);
 		if (hp < 1) {
 			//Debug.Log("깽창");
 			Instantiate (destroyed, transform.position, Quaternion.identity);
-			GameManager.instance.UpdateScore(score);
 			if(isDispenser){
 				Instantiate(items[Random.Range(0,3)], transform.position, transform.rotation);
 			}else if(Random.Range(0, 100) < 3){
-				Instantiate(dispenser, transform.position + new Vector3(0, 50f), transform.rotation);
+				Instantiate(dispenser, transform.position + new Vector3(0, 10f), transform.rotation);
 			}
 			Destroy(gameObject);
 		}

@@ -5,14 +5,13 @@ public class Player : MonoBehaviour {
 	
 //	public float moveTime = 0.1f;
 //	public LayerMask blockingLayer;
+
 	public float moveSpeed = 20f;
 	public float jumpForce = 40f;
 
 	public GameObject ultimate;
 	public GameObject[] hpImg;
-	public int hPoint = 2;
 
-//	private float inverseMoveTime;
 	private MeshRenderer mshRenderer;
 	private SphereCollider atkCollider;
 	private SphereCollider sldCollider;
@@ -23,23 +22,25 @@ public class Player : MonoBehaviour {
 	private GameObject sld;
 	private GameObject atk;
 
-	Rigidbody rigid;
-	Animator anim;
-	bool isGrounded;
-	bool itemEffect;
-	float time = 0;
-	float delay = 1f;
-	float colDelay = 1f;
-	float itemDelay = 10f;
+	private Rigidbody rigid;
+	private Animator anim;
 
+	private bool isGrounded;
+	private bool itemEffect;
+	private float time = 0;
+	private float delay = 1f;
+	private float colDelay = 1f;
+	private float itemDelay = 10f;
+	private int hPoint = 2;
+	private int ultGauge = 0;
+    private bool downdown;
 	void Awake () {
-		rigid = GetComponent<Rigidbody> ();
+        rigid = GetComponent<Rigidbody>();
+        anim = GetComponent<Animator>();
 //		atkCollider = GameObject.Find("_attack").GetComponent<SphereCollider> ();
 //		sldCollider = GameObject.Find("_shield").GetComponent<SphereCollider> ();
 //		atkScript = GetComponentInChildren<Attack> ();
 //		sldScript = GetComponentInChildren<Shield> ();
-		anim = GetComponent<Animator> ();
-		//		inverseMoveTime = 1f / moveTime;
 		atk = GameObject.Find("_attack");
 		sld = GameObject.Find("_shield");
 	}
@@ -52,25 +53,29 @@ public class Player : MonoBehaviour {
 
 	void Update() {
 		if (GameManager.instance.gameState == GAME_STATE.IN_GAME) {
-			if (Input.GetKeyDown(KeyCode.UpArrow) && isGrounded) {	//'UpArrow' Pressed
+			if (Input.GetKeyDown("up") && isGrounded) {
 				rigid.velocity = new Vector3(0, rigid.velocity.y);
 				rigid.AddForce(Vector3.up*jumpForce, ForceMode.VelocityChange);
 				isGrounded = false;
 			}
-
-			if (Input.GetKeyDown (KeyCode.DownArrow) && delay < 0) {	//Shield Pressed
+			if (Input.GetKeyDown ("down") && delay < 0) {
 				sld.gameObject.SetActive(true);
 				time = 10f;		//지속프레임.
 				delay = .7f;
 			}
-			if (Input.GetButtonDown ("Fire1")) {	//'Z' Pressed ( Atk )
+			if (Input.GetButtonDown ("Fire1")) {    //'Z' or 'X'
 				rigid.velocity = new Vector3(0, rigid.velocity.y);
 				atk.gameObject.SetActive(true);
-				time = 1f;		
-			}
-			if (Input.GetButtonDown ("Fire2")) {	//'X' Pressed ( Ult )
-				Instantiate(ultimate, transform.position, Quaternion.identity);
-				GameManager.instance.UpdateScore(0);
+				time = 1f;
+            }
+            if (Input.GetKeyDown(KeyCode.LeftControl))
+                downdown = true;
+			if (Input.GetKeyDown (KeyCode.LeftShift)) {
+                if (GameManager.instance.isGaugeFull) {
+                    Instantiate(ultimate, transform.position, Quaternion.identity);
+                    GameManager.instance.UpdateScore(0);
+                    GameManager.instance.isGaugeFull = false;
+                }
 			}
 
 			if (time < 0) {
@@ -89,21 +94,29 @@ public class Player : MonoBehaviour {
 			if((Input.GetAxisRaw("Horizontal")==1 && rigid.velocity.x<0) || (Input.GetAxisRaw("Horizontal")==-1 && rigid.velocity.x>0)){
 				rigid.velocity = new Vector3(0, rigid.velocity.y);
 			}
-			rigid.AddForce(new Vector3(Input.GetAxisRaw("Horizontal")*moveSpeed, 0), ForceMode.Impulse);
+            rigid.AddForce(new Vector3(Input.GetAxisRaw("Horizontal")*moveSpeed, 0), ForceMode.Impulse);
+//          float xAxis = Input.GetAxisRaw("Horizontal");
+//          float velocityFor = 100f;
+//          rigid.velocity = new Vector3((xAxis * velocityFor), rigid.velocity.y, rigid.velocity.z);
+
 //			Vector3 start = transform.position;
 //			Vector3 end = start + new Vector3 ((int)Input.GetAxisRaw("Horizontal")*15, 0);
 //			rigid.MovePosition (Vector3.Lerp(rigid.position, end, Time.deltaTime));
 //			Vector3 newPostion = Vector3.MoveTowards(rigid.position, end, inverseMoveTime * Time.deltaTime);
-//			rigid.MovePosition (end);
 		}
+        if (!isGrounded && downdown)
+        {
+            transform.position = new Vector3(transform.position.x, Mathf.Lerp(transform.position.y, 1.5f, Time.deltaTime * 10));
+        }
 		time--;
 		if(delay > 0)
 			delay -= Time.deltaTime;
 		if(colDelay > 0)
 			colDelay -= Time.deltaTime;
-		if (itemDelay > 0)
-			itemDelay -= Time.deltaTime;
-//		Debug.Log("colDelay : " + colDelay);
+        if (itemDelay > 0)
+            itemDelay -= Time.deltaTime;
+        else
+            anim.SetBool("isInvincible", false);
 	}
 
 	IEnumerator CollisionDelay(){
@@ -116,7 +129,9 @@ public class Player : MonoBehaviour {
 
 	void damaged(){
 		if (itemEffect && itemDelay > 0) {
-			itemEffect = false;
+            itemEffect = false;
+            anim.SetBool("isInvincible", false);
+            colDelay = 1f;
 			return;
 		}
 		if (hPoint >= 0) {
@@ -138,33 +153,35 @@ public class Player : MonoBehaviour {
 		}
 	}
 
-	public void itemMojito(){	//모히또.
-		itemEffect = true;
-		itemDelay = 10f;
-	}
+    public void itemMojito()
+    {	//모히또.
+        itemEffect = true;
+        anim.SetBool("isInvincible", true);
+        itemDelay = 10f;
+    }
 
 	public void itemYomamtte(){	//요맘때.
-
+        GameManager.instance.isGaugeFull = true;
 	}
 
-	void OnCollisionEnter(Collision collisionInfo) {
-		if (collisionInfo.gameObject.CompareTag ("Ground")) {
-			isGrounded = true;
-		}
-	}
-	
 	void OnCollisionExit(Collision collisionInfo) {
 		if (collisionInfo.gameObject.CompareTag ("Ground")) {
 			isGrounded = false;
 		}
 	}
 
-	void OnCollisionStay(Collision collisionInfo){
-		if(collisionInfo.gameObject.CompareTag("Obstacle")){
+    void OnCollisionStay(Collision collisionInfo)
+    {
+        if (collisionInfo.gameObject.CompareTag("Ground"))
+        {
+            downdown = false;
+            isGrounded = true;
+        }
+		if(collisionInfo.gameObject.CompareTag("Obstacle"))
+        {
 			if(isGrounded && colDelay < 0){
 				damaged();
 			}
 		}
 	}
-
 }

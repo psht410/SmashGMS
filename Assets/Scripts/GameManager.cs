@@ -11,20 +11,26 @@ public enum GAME_STATE{
 public class GameManager : MonoBehaviour {
 	
 	public static GameManager instance = null;
-	
+
 	public GAME_STATE gameState;
-	public GameObject[] obstacle;
 	
+    public GameObject[] obstacle;
 	public GameObject gameOverPanel;
 	public GameObject gameClearPanel;
 	public GameObject waveAlertText;
 	
+	public Sprite gameClear, gameOver;
+    public Button btn;
+
 	private GameObject selectedPanel = null;
-	
+
+    private Animator ultGaugeFrame;
+    private Image ultGauge;
+
 	private Text scoreText;
 	private Text waveText;
 	
-	private int currentScore = 0;
+	private long currentScore = 0;
 	private int currentSpawnIndex = 0;
 	private int currentCombo = 0;
 	private int currentWave = 0;
@@ -35,7 +41,8 @@ public class GameManager : MonoBehaviour {
 								4, 3, 4, 4, 2, 3, 1,	//Wave 3
 								1,						//Wave 4 ( BOSS_GMSGATE )
 								1						//Wave 5 ( FINAL_BOSS )
-	};
+	                            };
+    private int[] bossIndex = {0, 7, 13, 20, 21, 22 };
 	private int[] spawnPosition = {-10, 0, 10};
 	
 	// Use this for initialization
@@ -45,11 +52,17 @@ public class GameManager : MonoBehaviour {
 		} else if (instance != this) {
 			Destroy(gameObject);
 		}
-		StartCoroutine ("GenerateWave");
+        gameState = GAME_STATE.IN_GAME;
+        if (!MenuManager.SELECTED_MODE)
+            StartCoroutine("GenerateWave");
+        else
+            StartCoroutine("GenerateWaveGMS");
 		scoreText = GameObject.Find ("ComboScore").GetComponent<Text> ();
 		waveText = waveAlertText.GetComponent<Text> ();
+        ultGaugeFrame = GameObject.Find("UltGaugeFrame").GetComponent<Animator>();
+        ultGauge = GameObject.Find("UltGauge").GetComponent<Image>();
 	}
-	
+
 	IEnumerator GenerateWave(){
 		if (obstacle.Length == 0) {
 			yield break;
@@ -57,56 +70,111 @@ public class GameManager : MonoBehaviour {
 		
 		while (true) {
 			//Debug.Log ("현재 인덱스 : " + currentSpawnIndex);
-			
-			if(currentSpawnIndex == 0 || currentSpawnIndex == 8 || currentSpawnIndex == 14 || currentSpawnIndex == 21){
+            int prevRndPos = 0;
+            int tempRndPos = (int)Random.Range(0, spawnPosition.Length);
+            GameObject[] wave3grid = new GameObject[3];
+
+			if(currentSpawnIndex == 0 || currentSpawnIndex == 8 || currentSpawnIndex == 14 || currentSpawnIndex == 21){ //웨이브 넘어갈때.
 				yield return new WaitForSeconds(1);
 				waveAlertText.SetActive(true);
-				GameObject.Find("WaveAlert").GetComponent<Text>().text = "Wave " + ++currentWave;
+				waveAlertText.GetComponent<Text>().text = "Wave " + ++currentWave;
 				yield return new WaitForSeconds(1);
 				waveAlertText.SetActive(false);
 			}
-			
-			GameObject wave = null;
-//			for(int times = 0; times<spawnTimes[currentSpawnIndex]; times++){	//Spawn Obstacles
-				int prevRndPos = 0;
-				int tempRndPos = (int)Random.Range(0, spawnPosition.Length);
-				GameObject[] wave3grid = new GameObject[3];
 
-				if(currentSpawnIndex == 5 || currentSpawnIndex == 6 || currentSpawnIndex == 8 || currentSpawnIndex == 14 || currentSpawnIndex == 15 || currentSpawnIndex == 16 || currentSpawnIndex == 17 || currentSpawnIndex == 18 || currentSpawnIndex == 19){
-					for(int j=0; j<3; j++){
-						tempRndPos = (int)Random.Range(0, spawnPosition.Length);
-						if(prevRndPos != tempRndPos){
-							wave3grid[j] = Instantiate(obstacle[currentSpawnIndex], transform.position + new Vector3(spawnPosition[tempRndPos], 0), transform.rotation) as GameObject;
-							wave3grid[j].transform.parent = transform;
-						}
-						prevRndPos = tempRndPos;
-						Debug.Log("3칸짜리 생성" + j);
-					}
-				}else{
-					wave = Instantiate(obstacle[currentSpawnIndex], transform.position, transform.rotation) as GameObject;
-					wave.transform.parent = transform;
-				}
-				yield return new WaitForSeconds(Random.Range(.8f, 2));
+            GameObject wave = null;
+            bool isAnyoneCantSpawn = false;
+//          for(int times = 0; times<spawnTimes[currentSpawnIndex]; times++){	//Spawn Obstacles
+            while  (spawnTimes[currentSpawnIndex] != 0)
+                {
+
+                    if (currentSpawnIndex == 5 || currentSpawnIndex == 6 || currentSpawnIndex == 8 || currentSpawnIndex == 14 || currentSpawnIndex == 15 || currentSpawnIndex == 16 || currentSpawnIndex == 17 || currentSpawnIndex == 18 || currentSpawnIndex == 19)
+                    {
+                        for (int j = 0; j < 3; j++)
+                        {
+                            tempRndPos = (int)Random.Range(0, spawnPosition.Length);
+                            if (prevRndPos != tempRndPos)
+                            {
+                                wave3grid[j] = Instantiate(obstacle[currentSpawnIndex], transform.position + new Vector3(spawnPosition[tempRndPos], 0), transform.rotation) as GameObject;
+                                wave3grid[j].transform.parent = transform;
+                            }
+                            prevRndPos = tempRndPos;
+                        }
+                    }
+                    else
+                    {
+                        wave = Instantiate(obstacle[currentSpawnIndex], transform.position, transform.rotation) as GameObject;
+                        wave.transform.parent = transform;
+                    }
+                    
+                    spawnTimes[currentSpawnIndex]--;
+                    randomIndex();
+                    for (int index = 0; index < bossIndex[currentWave]; index++)
+                    {
+                        if (spawnTimes[index] != 0)
+                        {
+                            currentSpawnIndex = index;
+                        }
+                    }       
+                    yield return new WaitForSeconds(Random.Range(.8f, 2f));
+                    if (isAnyoneCantSpawn)
+                    {
+                        wave = Instantiate(obstacle[bossIndex[currentWave]], transform.position, transform.rotation) as GameObject;
+                        wave.transform.parent = transform;
+                    }
+                }
 //			}
 
 			while(transform.childCount != 0){
-				yield return new WaitForEndOfFrame();	// 자식 오브젝트가 전부 없어지기 전까지 대기.
+				yield return new WaitForEndOfFrame();
 			}
 			
-			if (obstacle.Length <= ++currentSpawnIndex) { // 클리어.
-				GameOver(true, true);
+			if (obstacle.Length <= ++currentSpawnIndex) {
+                yield return new WaitForSeconds(3f);
+				GameOver(false, true);
 			}
 			
 			if(gameState == GAME_STATE.GAME_OVER)
 				yield break;
 
-			yield return new WaitForSeconds(1);
+			yield return new WaitForSeconds(1f);
 		}
 		
 		//Debug.Log ("코루틴 끝");
 	}
-	
+
+	IEnumerator GenerateWaveGMS(){
+		if (obstacle.Length == 0) {
+			yield break;
+		}
+
+		yield return new WaitForSeconds(1);
+		waveAlertText.SetActive(true);
+		waveAlertText.GetComponent<Text>().text = "GMS START";
+		yield return new WaitForSeconds(1);
+		waveAlertText.SetActive(false);
+
+        GameObject wave = null;
+
+		while (gameState == GAME_STATE.IN_GAME) {
+			wave = Instantiate(obstacle[bossIndex[(int)Random.Range(1, bossIndex.Length-1)]], transform.position, transform.rotation) as GameObject;
+			wave.GetComponent<Obstacle>().hp = (int)Random.Range(5, 10);
+			wave.transform.parent = transform;
+			
+			while(transform.childCount > 3){
+				yield return new WaitForEndOfFrame();
+			}
+			
+			if(gameState == GAME_STATE.GAME_OVER)
+				yield break;
+			
+			yield return new WaitForSeconds(1);
+		}
+	}
+
 	public void UpdateScore(int score){
+        ultGauge.fillAmount += (currentCombo / 1000f);
+        if (isGaugeFull) ultGaugeFrame.SetBool("isFull", true);
 		currentCombo++;
 		if (score == 0)
 			currentCombo = 0;
@@ -123,9 +191,11 @@ public class GameManager : MonoBehaviour {
 			selectedPanel = gameClearPanel;
 			selectedPanel.SetActive (true);
 			
+			string mod = (MenuManager.SELECTED_MODE)?"GMS":"NORMAL";
+
 			GameObject.Find("Result").GetComponent<Text> ().text =
 				"CLEAR    : " + isClear + "\n" +
-				"MODE     : " + "응~" + "\n" +
+				"MODE     : " + mod + "\n" +
 				"MAXCombo : " + maxcurrentCombo + "\n" +
 				"SCORE    : " + currentScore;
 		} else {
@@ -133,11 +203,52 @@ public class GameManager : MonoBehaviour {
 				selectedPanel.SetActive(false);
 			selectedPanel = gameOverPanel;
 			selectedPanel.SetActive (true);
+			if(isClear){
+				GameObject.Find("Game").GetComponent<Image>().sprite = gameClear;
+                btn.onClick.RemoveAllListeners();
+                btn.onClick.AddListener(() => GameOver(true, true));
+            }
+		}
+	}
+
+	void randomIndex(){
+		switch (currentWave)
+		{
+		case 1:
+			currentSpawnIndex = (int)Random.Range(0, 7);
+			break;
+		case 2:
+			currentSpawnIndex = (int)Random.Range(8, 13);
+			break;
+		case 3:
+			currentSpawnIndex = (int)Random.Range(14, 20);
+			break;
 		}
 	}
 	
+	public bool isGaugeFull{
+		get{
+			return (ultGauge.fillAmount == 1);
+		}
+		set{
+			if (!value)
+			{
+				ultGaugeFrame.SetBool("isFull", false);
+				ultGauge.fillAmount = 0;
+			}
+			else
+			{
+                ultGauge.fillAmount = 1;
+            }
+        }
+    }
+
 	public void GameOverNotClear(){
 		GameOver (true, false);
+	}
+
+	public void GameOverClear(){
+		GameOver (true, true);
 	}
 	
 	public void InitGame(){
@@ -147,5 +258,5 @@ public class GameManager : MonoBehaviour {
 	public void MainMenu(){
 		Application.LoadLevel ("MainMenu");
 	}
-	
+
 }

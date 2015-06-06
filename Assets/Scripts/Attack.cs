@@ -5,6 +5,8 @@ public class Attack : MonoBehaviour {
 
 	private int myDamage = 1;
 
+	public GameObject damaged;
+
 	public bool isUlt = false;
 
 	void Start(){
@@ -19,6 +21,8 @@ public class Attack : MonoBehaviour {
 	void OnTriggerEnter(Collider other){
 		if (other.CompareTag ("Obstacle")) {
 			other.GetComponent<Obstacle>().isDamaged(myDamage);
+			GameObject dmgEffect = Instantiate(damaged, transform.position, damaged.transform.rotation) as GameObject;
+			Destroy(dmgEffect, 2f);
 			//Debug.Log ("공격이 닿았다!");
 		}
 	}
