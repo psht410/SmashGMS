@@ -17,7 +17,7 @@ public class Portal : MonoBehaviour {
 		direction = (int)what;
 	}
 
-	/*
+	/*	중복 없는 랜덤을 리스트로 구현해봤는데 안쓰게 됨 ㅋㅋㅋㅋㅋㅋㅋㅋㅋ
 	private float[] noiseValues = {9, 99, 999, 9999, 99999};
 	void Start() {
 		List<float> temp_list = new List<float>(noiseValues); 

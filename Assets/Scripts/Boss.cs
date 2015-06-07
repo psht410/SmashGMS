@@ -23,14 +23,12 @@ public class Boss : MonoBehaviour {
 
     void FixedUpdate()
     {
-        print(transform.position.y);
         transform.Translate(Vector3.down * transform.position.y / 500f);
 
         if (transform.position.y > 30f && !coroutineStarted) StartCoroutine(SunhanBeam());
 
         if (transform.position.y > 10f && pushDelay < 0)
         {
-            print("보스가 누르신다");
             rigid.AddForce(new Vector3(0, -50f), ForceMode.Impulse);
             pushDelay = Random.Range(5, 10);
         }
@@ -45,7 +43,6 @@ public class Boss : MonoBehaviour {
 
     IEnumerator SunhanBeam()
     {
-        print("코루틴 시작 선한빔");
         coroutineStarted = true;
         if (sunhan.Length == 0)
         {
@@ -71,16 +68,11 @@ public class Boss : MonoBehaviour {
             yield return new WaitForEndOfFrame();
         }
 
-        print("선한빔 1차 종료");
-
         if (GameManager.instance.gameState == GAME_STATE.GAME_OVER || transform.position.y < 20)
         {
             coroutineStarted = false;
             yield break;
         }
-
-        coroutineStarted = false;
-
 
     }
 
