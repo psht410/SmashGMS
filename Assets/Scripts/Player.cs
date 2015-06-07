@@ -34,6 +34,8 @@ public class Player : MonoBehaviour {
 	private int hPoint = 2;
 	private int ultGauge = 0;
     private bool downdown;
+    private bool damagedFromBoss;
+
 	void Awake () {
         rigid = GetComponent<Rigidbody>();
         anim = GetComponent<Animator>();
@@ -128,6 +130,10 @@ public class Player : MonoBehaviour {
 	}
 
 	void damaged(){
+        if (GameManager.instance.isBossAwaken)
+        {
+            damagedFromBoss = true;
+        }
 		if (itemEffect && itemDelay > 0) {
             itemEffect = false;
             anim.SetBool("isInvincible", false);
@@ -179,11 +185,24 @@ public class Player : MonoBehaviour {
             downdown = false;
             isGrounded = true;
         }
-		if(collisionInfo.gameObject.CompareTag("Obstacle"))
+        if (collisionInfo.gameObject.CompareTag("Obstacle"))
         {
-			if(isGrounded && colDelay < 0){
-				damaged();
-			}
-		}
-	}
+            if (isGrounded && colDelay < 0)
+            {
+                damaged();
+            }
+        }
+    }
+
+    public bool bossHitMe
+    {
+        get
+        {
+            return damagedFromBoss;
+        }
+        set
+        {
+            damagedFromBoss = value;
+        }
+    }
 }

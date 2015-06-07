@@ -25,6 +25,11 @@ public class GameManager : MonoBehaviour {
 
 	public Sprite gameClear, gameOver;
     public Button btn;
+	public Text nameText;
+
+	private string mod;
+	private string addRecordURL = "http://psht410.dnip.net/~sanghoon/registerRecord.php?";
+	private string secretKey = "_SmashGMS";
 
 	private GameObject selectedPanel = null;
 
@@ -33,13 +38,15 @@ public class GameManager : MonoBehaviour {
 
 	private Text scoreText;
 	private Text waveText;
-	
+
+	private bool isClear;
+
 	private long currentScore = 0;
 
 	private int currentSpawnIndex = 0;
 	private int currentCombo = 0;
 	private int currentWave = 0;
-	private	int maxcurrentCombo = 0;
+	private	int maxCombo = 0;
 	
 	private int[] spawnTimes = {3, 3, 2, 1, 3, 4, 3, 1,	//Wave 1
 								3, 4, 2, 3, 4, 1,		//Wave 2
@@ -49,7 +56,21 @@ public class GameManager : MonoBehaviour {
 	                            };
     private int[] bossIndex = {0, 7, 13, 20, 21, 22 };
 	private int[] spawnPosition = {-10, 0, 10};
-	
+
+    public bool isBossAwaken
+    {
+        get
+        {
+            return (currentSpawnIndex==22)?true:false;
+        }
+    }
+
+    [ContextMenu("Dump Boss Wave")]
+    void awakeBoss()
+    {
+        currentSpawnIndex = 22;
+    }
+
 	// Use this for initialization
 	void Awake () {
 		if (instance == null) {
@@ -57,11 +78,13 @@ public class GameManager : MonoBehaviour {
 		} else if (instance != this) {
 			Destroy(gameObject);
 		}
+		print ("hello");
         gameState = GAME_STATE.IN_GAME;
         if (!MenuManager.SELECTED_MODE)
             StartCoroutine("GenerateWave");
         else
-            StartCoroutine("GenerateWaveGMS");
+			StartCoroutine("GenerateWaveGMS");
+		mod = (MenuManager.SELECTED_MODE)?"GMS":"NORMAL";
 		scoreText = GameObject.Find ("ComboScore").GetComponent<Text> ();
 		waveText = waveAlertText.GetComponent<Text> ();
         ultGaugeFrame = GameObject.Find("UltGaugeFrame").GetComponent<Animator>();
@@ -199,7 +222,7 @@ public class GameManager : MonoBehaviour {
 		currentCombo++;
 		if (score == 0)
 			currentCombo = 0;
-		maxcurrentCombo = (maxcurrentCombo > currentCombo) ? maxcurrentCombo : currentCombo;
+		maxCombo = (maxCombo > currentCombo) ? maxCombo : currentCombo;
 		currentScore += score * currentCombo * 10 / 25;
 		scoreText.text = currentCombo + "x " + currentScore;
 	}
@@ -211,13 +234,12 @@ public class GameManager : MonoBehaviour {
 				selectedPanel.SetActive(false);
 			selectedPanel = gameClearPanel;
 			selectedPanel.SetActive (true);
-			
-			string mod = (MenuManager.SELECTED_MODE)?"GMS":"NORMAL";
 
+			this.isClear = isClear;
 			GameObject.Find("Result").GetComponent<Text> ().text =
 				"CLEAR    : " + isClear + "\n" +
 				"MODE     : " + mod + "\n" +
-				"MAXCombo : " + maxcurrentCombo + "\n" +
+				"MAXCombo : " + maxCombo + "\n" +
 				"SCORE    : " + currentScore;
 		} else {
 			if(selectedPanel != null)
@@ -263,6 +285,34 @@ public class GameManager : MonoBehaviour {
             }
         }
     }
+
+	public void recordRegister(){
+		string name = nameText.GetComponent<Text> ().text;
+		Debug.Log ("니 이름 : " + name);
+		StartCoroutine (PostScores (name));
+	}
+
+	IEnumerator PostScores(string name)
+	{
+		Debug.Log ("isClear : " + isClear);
+		//기록자 이름과 score를 가지고 비밀키로 해시값을 만들어냄.
+		string hash = MD5.Md5Sum(name + currentScore + secretKey);
+		
+		//이후 기록 url로 정보전송 이때 인젝션 방지를 위해 EscapeURL을 사용.
+		string post_url = addRecordURL + "id=" + WWW.EscapeURL(name) + "&mode=" + mod + "&clear=" + isClear + "&combo=" + maxCombo + "&score=" + currentScore + "&hash=" + hash;
+		
+		// 해당 URL로 포스팅
+		WWW hs_post = new WWW(post_url);
+		yield return hs_post; // 결과가 올때까지 대기.
+		
+		if (hs_post.error != null) {
+			//만약 결과가 에러라면. 에러 출력.
+			print ("There was an error posting the high score: " + hs_post.error);
+		} else {
+			MainMenu();
+		}
+	}
+
 
     public void PlaySingle(AudioClip clip)
     {
