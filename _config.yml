@@ -23,7 +23,11 @@
 
 
 # Site settings
+<<<<<<< HEAD
 title: Introduction of IWBTG~SmashGMS~
+=======
+title: Introduction of IWBTG ~SmashGMS~
+>>>>>>> gh-pages
 email: psht410@gmail.com
 description: > # this means to ignore newlines until "baseurl:"
   Hello, I'm Naveen, a freelance front-end developer
